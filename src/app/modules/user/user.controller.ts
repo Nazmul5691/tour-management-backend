@@ -21,7 +21,6 @@ import { sendResponse } from "../../utils/sendResponse";
 
 // const createUser = async (req: Request, res: Response, next: NextFunction) =>{
 //     try {
-
 //         const user = await UserServices.createUser(req.body);
 
 //         res.status(httpStatus.CREATED).json({
@@ -40,10 +39,6 @@ import { sendResponse } from "../../utils/sendResponse";
 const createUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const user = await UserServices.createUser(req.body);
 
-    // res.status(httpStatus.CREATED).json({
-    //     message: 'User successfully created',
-    //     user
-    // })
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.CREATED,
@@ -69,11 +64,6 @@ const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFun
 
     const result= await UserServices.getAllUsers();
 
-    // res.status(httpStatus.OK).json({
-    //     success: true,
-    //     message: 'All users retrieved successfully',
-    //     data: users
-    // })
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.CREATED,
