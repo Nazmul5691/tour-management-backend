@@ -15,19 +15,20 @@ export const checkAuth = (...authRoles: string[]) => (req: Request, res: Respons
             throw new AppError(403, "No token received");
         }
 
-        const verifiedTOken = verifyToken(accessToken, envVars.JWT_ACCESS_SECRET) as JwtPayload
+        const verifiedToken = verifyToken(accessToken, envVars.JWT_ACCESS_SECRET) as JwtPayload
 
 
-        // if((verifiedTOken as JwtPayload).role !== Role.ADMIN || Role.SUPER_ADMIN){
-        // if ((verifiedTOken as JwtPayload).role !== Role.ADMIN) {
+        // if((verifiedToken as JwtPayload).role !== Role.ADMIN || Role.SUPER_ADMIN){
+        // if ((verifiedToken as JwtPayload).role !== Role.ADMIN) {
 
         // authRoles = ["ADMIN", "SUPER_ADMIN"].includes("ADMIN")
-        if (!authRoles.includes(verifiedTOken.role)) {
+
+        if (!authRoles.includes(verifiedToken.role)) {
             throw new AppError(403, "You are not permitted to view this route!!!");
         }
 
-        // console.log('token', verifiedTOken);
-
+        // console.log('token', verifiedToken);
+        req.user = verifiedToken;
         next()
 
     } catch (error) {
