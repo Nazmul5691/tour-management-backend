@@ -32,9 +32,17 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
     // const accessToken = jwt.sign(jwtPayload, "secret", {expiresIn: "1d"})
     const accessToken = generateToken(jwtPayload, envVars.JWT_ACCESS_SECRET, envVars.JWT_ACCESS_EXPIRES)
 
+    const refreshToken = generateToken(jwtPayload, envVars.JWT_REFRESH_SECRET, envVars.JWT_REFRESH_EXPIRES)
+
+    // delete isUserExit.password
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: pass , ...rest} = isUserExit
+
     return {
         // email: isUserExit.email
-        accessToken
+        accessToken,
+        refreshToken,
+        user: rest
     }
 
 
