@@ -3,10 +3,13 @@ import { JwtPayload } from "jsonwebtoken";
 import AppError from "../errorHelpers/appError";
 import { verifyToken } from "../utils/jwt";
 import { envVars } from "../config/env";
+import { User } from "../modules/user/user.model";
+import { IsActive } from "../modules/user/user.interface";
+import httpStatus from 'http-status-codes';
 
 
 
-export const checkAuth = (...authRoles: string[]) => (req: Request, res: Response, next: NextFunction) => {
+export const checkAuth = (...authRoles: string[]) => async (req: Request, res: Response, next: NextFunction) => {
 
     try {
         const accessToken = req.headers.authorization;
@@ -22,6 +25,18 @@ export const checkAuth = (...authRoles: string[]) => (req: Request, res: Respons
         // if ((verifiedToken as JwtPayload).role !== Role.ADMIN) {
 
         // authRoles = ["ADMIN", "SUPER_ADMIN"].includes("ADMIN")
+
+        const isUserExit = await User.findOne({ email: verifiedToken.email });
+
+        if (!isUserExit) {
+            throw new AppError(httpStatus.BAD_REQUEST, "User does not exist")
+        }
+        if (isUserExit.isActive === IsActive.BLOCKED || isUserExit.isActive === IsActive.INACTIVE) {
+            throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExit.isActive}`)
+        }
+        if (isUserExit.isDeleted) {
+            throw new AppError(httpStatus.BAD_REQUEST, "User is deleted")
+        }
 
         if (!authRoles.includes(verifiedToken.role)) {
             throw new AppError(403, "You are not permitted to view this route!!!");
