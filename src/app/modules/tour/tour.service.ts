@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { QueryBuilder } from "../../utils/queryBuilder";
 import { tourSearchableFields } from "./tour.constant";
@@ -99,30 +100,89 @@ const createTour = async (payload: ITour) => {
 //     }
 // };
 
+// const getAllTours = async (query: Record<string, string>) => {
+
+//     const queryBuilder = new QueryBuilder(Tour.find(), query)
+
+//     const tours = await queryBuilder
+//         .search(tourSearchableFields)
+//         .filter()
+//         .sort()
+//         .fields()
+//         .paginate()
+
+//     // const meta = await queryBuilder.getMeta()
+
+//     const [data, meta] = await Promise.all([
+//         tours.build(),
+//         queryBuilder.getMeta()
+//     ])
+
+
+//     return {
+//         data,
+//         meta: { total: meta.total }
+//     }
+// };
+
+
+
 const getAllTours = async (query: Record<string, string>) => {
 
-    const queryBuilder = new QueryBuilder(Tour.find(), query)
+    // console.log(query);
+    const filter = query
 
-    const tours = await queryBuilder
-        .search(tourSearchableFields)
-        .filter()
-        .sort()
-        .fields()
-        .paginate()
+    const searchTerm = query.searchTerm || ""
 
-    // const meta = await queryBuilder.getMeta()
+    delete filter["searchTerm"]
 
-    const [data, meta] = await Promise.all([
-        tours.build(),
-        queryBuilder.getMeta()
-    ])
+    const searchQuery = {
+        $or: tourSearchableFields.map(field => ({ [field]: { $regex: searchTerm, $options: "i" } }))
+    }
+    const tours = await Tour.find(searchQuery).find(filter)
+
+    const totalTours = await Tour.countDocuments()
 
 
     return {
-        data,
-        meta: { total: meta.total }
+        data: tours,
+        meta: {
+            total: totalTours
+        }
     }
 };
+
+
+
+// make case sensitive for location
+// const getAllTours = async (query: Record<string, string>) => {
+//     const { searchTerm, ...filters } = query;
+
+//     const filter: any = {};
+
+//     // Handle searchTerm
+//     if (searchTerm) {
+//         filter.$or = tourSearchableFields.map(field => ({
+//             [field]: { $regex: searchTerm, $options: 'i' }
+//         }));
+//     }
+
+//     // Handle other filters (e.g., location)
+//     for (const key in filters) {
+//         filter[key] = { $regex: filters[key], $options: 'i' };
+//     }
+
+//     const tours = await Tour.find(filter);
+//     const total = await Tour.countDocuments(filter);
+
+//     return {
+//         data: tours,
+//         meta: {
+//             total
+//         }
+//     };
+// };
+
 
 
 const updateTour = async (id: string, payload: Partial<ITour>) => {
