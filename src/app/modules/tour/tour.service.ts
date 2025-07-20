@@ -7,6 +7,7 @@ import { Tour, TourType } from "./tour.model";
 
 
 const createTour = async (payload: ITour) => {
+
     const existingTour = await Tour.findOne({ title: payload.title });
     if (existingTour) {
         throw new Error("A tour with this title already exists.");
@@ -119,7 +120,7 @@ const getAllTours = async (query: Record<string, string>) => {
 
     return {
         data,
-        meta
+        meta: { total: meta.total }
     }
 };
 
@@ -154,6 +155,8 @@ const deleteTour = async (id: string) => {
 };
 
 
+
+// tour type
 const createTourType = async (payload: ITourType) => {
     const existingTourType = await TourType.findOne({ name: payload.name });
 
