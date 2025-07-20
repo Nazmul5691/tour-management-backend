@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-dynamic-delete */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { excludeField } from "../../constants";
 import { QueryBuilder } from "../../utils/queryBuilder";
 import { tourSearchableFields } from "./tour.constant";
 import { ITour, ITourType } from "./tour.interface";
@@ -133,13 +135,24 @@ const getAllTours = async (query: Record<string, string>) => {
     const filter = query
 
     const searchTerm = query.searchTerm || ""
+    const sort = query.sort || "createdAt"
+    const fields = query.fields?.split(",").join(" ") || ""
+    const page = Number(query.page) || 1
+    const limit = Number(query.limit) || 10
 
-    delete filter["searchTerm"]
+    const skip = (page -1) * limit
+
+    // delete filter["searchTerm"];
+    // delete filter["sort"]
+
+    for(const field of excludeField){
+        delete filter[field]
+    }
 
     const searchQuery = {
         $or: tourSearchableFields.map(field => ({ [field]: { $regex: searchTerm, $options: "i" } }))
     }
-    const tours = await Tour.find(searchQuery).find(filter)
+    const tours = await Tour.find(searchQuery).find(filter).sort(sort).select(fields).skip(skip).limit(limit)
 
     const totalTours = await Tour.countDocuments()
 
