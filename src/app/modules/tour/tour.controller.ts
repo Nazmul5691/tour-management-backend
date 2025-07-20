@@ -16,6 +16,8 @@ const createTour = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+
+
 const getAllTours = catchAsync(async (req: Request, res: Response) => {
 
     const query = req.query
@@ -29,6 +31,8 @@ const getAllTours = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+
+
 const updateTour = catchAsync(async (req: Request, res: Response) => {
 
     const result = await TourService.updateTour(req.params.id, req.body);
@@ -39,6 +43,8 @@ const updateTour = catchAsync(async (req: Request, res: Response) => {
         data: result,
     });
 });
+
+
 
 const deleteTour = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
