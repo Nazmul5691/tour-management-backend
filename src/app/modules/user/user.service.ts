@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import AppError from "../../errorHelpers/appError";
 import { IAuthProvider, IUser, Role } from "./user.interface";
 import { User } from "./user.model";
@@ -5,6 +6,8 @@ import httpStatus from 'http-status-codes';
 import bcryptjs from 'bcryptjs';
 import { envVars } from "../../config/env";
 import { JwtPayload } from "jsonwebtoken";
+import { QueryBuilder } from "../../utils/queryBuilder";
+import { divisionSearchableFields } from "../division/division.constant";
 
 
 // const createUser = async (payload: Partial<IUser>) =>{
@@ -60,32 +63,32 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
 
     const ifUserExists = await User.findById(userId);
 
-    if(!ifUserExists){
+    if (!ifUserExists) {
         throw new AppError(httpStatus.NOT_FOUND, "User not found");
     }
 
-    if(payload.role){
-        if(decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE){
+    if (payload.role) {
+        if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
             throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
         }
 
-        if(payload.role === Role.SUPER_ADMIN && decodedToken.role === Role.ADMIN){
-             throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
+        if (payload.role === Role.SUPER_ADMIN && decodedToken.role === Role.ADMIN) {
+            throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
         }
     }
 
-    if(payload.isActive || payload.isDeleted || payload.isVerified){
-        if(decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE){
-             throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
+    if (payload.isActive || payload.isDeleted || payload.isVerified) {
+        if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
+            throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
         }
     }
 
-    if(payload.password){
+    if (payload.password) {
         payload.password = await bcryptjs.hash(payload.password, envVars.BCRYPT_SALT_ROUND)
     }
 
 
-    const newUpdatedUser = await User.findByIdAndUpdate(userId, payload, {new: true, runValidators: true})
+    const newUpdatedUser = await User.findByIdAndUpdate(userId, payload, { new: true, runValidators: true })
 
     return newUpdatedUser;
 
@@ -93,23 +96,53 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
 
 
 // get all users
-const getAllUsers = async () => {
-    const users = await User.find();
+// const getAllUsers = async () => {
+//     const users = await User.find();
 
-    const totalUsers = await User.countDocuments()
+//     const totalUsers = await User.countDocuments()
+
+//     return {
+//         data: users,
+//         meta: {
+//             total: totalUsers
+//         }
+//     };
+// }
+const getAllUsers = async (query: Record<string, string>) => {
+
+    const queryBuilder = new QueryBuilder(User.find(), query)
+
+    const divisionsData = await queryBuilder
+        .search(divisionSearchableFields)
+        .sort()
+        .filter()
+        .fields()
+        .paginate()
+
+    const [data, meta] = await Promise.all([
+        divisionsData.build(),
+        queryBuilder.getMeta()
+    ])
 
     return {
-        data: users,
-        meta: {
-            total: totalUsers
-        }
-    };
+        data,
+        meta
+    }
 }
+
+
+const getSingleUser = async (id: string) => {
+    const user = await User.findById(id);
+    return {
+        data: user
+    }
+};
 
 
 
 export const UserServices = {
     createUser,
     getAllUsers,
+    getSingleUser,
     updateUser
 }
