@@ -11,8 +11,11 @@ import { TourController } from "./tour.controller";
 
 const router = express.Router();
 
+
+
 /* ------------------ TOUR TYPE ROUTES -------------------- */
 router.get("/tour-types", TourController.getAllTourTypes);
+
 
 router.post(
     "/create-tour-type",
@@ -20,7 +23,10 @@ router.post(
     validateRequest(createTourTypeZodSchema),
     TourController.createTourType
 );
+
+
 router.get("/tour-types/:id", TourController.getSingleTourType)
+
 
 router.patch(
     "/tour-types/:id",
@@ -29,10 +35,16 @@ router.patch(
     TourController.updateTourType
 );
 
+
 router.delete("/tour-types/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), TourController.deleteTourType);
+
+
+
+
 
 /* --------------------- TOUR ROUTES ---------------------- */
 router.get("/", TourController.getAllTours);
+
 
 router.post(
     "/create",
@@ -40,7 +52,11 @@ router.post(
     validateRequest(createTourZodSchema),
     TourController.createTour
 );
+
+
 router.get("/:slug", TourController.getSingleTour);
+
+
 router.patch(
     "/:id",
     checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
@@ -48,8 +64,8 @@ router.patch(
     TourController.updateTour
 );
 
-router.delete("/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), TourController.deleteTour);
 
+router.delete("/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), TourController.deleteTour);
 
 
 

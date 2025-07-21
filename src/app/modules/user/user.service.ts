@@ -62,9 +62,20 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
      */
 
     const ifUserExists = await User.findById(userId);
+    // const isPhoneNumberExits = await User.findOne(phone)
+
+
 
     if (!ifUserExists) {
         throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    }
+
+    if (payload.phone) {
+        const isPhoneNumberExits = await User.findOne({ phone: payload.phone });
+
+        if (isPhoneNumberExits && isPhoneNumberExits._id.toString() !== userId) {
+            throw new AppError(httpStatus.BAD_REQUEST, "This phone number is already taken");
+        }
     }
 
     if (payload.role) {

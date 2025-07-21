@@ -41,8 +41,12 @@ const userSchema = new Schema<IUser>(
         },
         phone: {
             type: String,
+            unique: true
         },
         picture: {
+            type: String
+        },
+        address: {
             type: String
         },
         isDeleted: {
