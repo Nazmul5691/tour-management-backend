@@ -3,6 +3,9 @@ import { catchAsync } from '../../utils/catchAsync';
 import { sendResponse } from '../../utils/sendResponse';
 import { TourService } from './tour.service';
 
+
+
+// tour
 const createTour = catchAsync(async (req: Request, res: Response) => {
 
     //  console.log('Incoming request body:', req.body);
@@ -96,6 +99,8 @@ const updateTourType = catchAsync(async (req: Request, res: Response) => {
         data: result,
     });
 });
+
+
 const deleteTourType = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
     const result = await TourService.deleteTourType(id);

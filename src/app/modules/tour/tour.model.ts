@@ -50,6 +50,12 @@ const tourSchema = new Schema<ITour>(
         endDate: {
             type: Date
         },
+        departureLocation: {
+            type: String
+        },
+        arrivalLocation: {
+            type: String
+        },
         included: {
             type: [String],
             default: []
