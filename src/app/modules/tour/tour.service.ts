@@ -5,6 +5,7 @@ import { ITour, ITourType } from "./tour.interface";
 import { Tour, TourType } from "./tour.model";
 
 
+///////////////////// tour ///////////////////
 const createTour = async (payload: ITour) => {
 
     const existingTour = await Tour.findOne({ title: payload.title });
@@ -124,7 +125,6 @@ const createTour = async (payload: ITour) => {
 // };
 
 
-
 const getAllTours = async (query: Record<string, string>) => {
 
     const queryBuilder = new QueryBuilder(Tour.find(), query)
@@ -151,8 +151,7 @@ const getAllTours = async (query: Record<string, string>) => {
 };
 
 
-
-// make case sensitive for location
+// make case insensitive for location
 // const getAllTours = async (query: Record<string, string>) => {
 //     const { searchTerm, ...filters } = query;
 
@@ -182,7 +181,6 @@ const getAllTours = async (query: Record<string, string>) => {
 // };
 
 
-
 const updateTour = async (id: string, payload: Partial<ITour>) => {
 
     const existingTour = await Tour.findById(id);
@@ -208,12 +206,15 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
     return updatedTour;
 };
 
+
 const deleteTour = async (id: string) => {
     return await Tour.findByIdAndDelete(id);
 };
 
 
 
+
+///////////////////// tour type ///////////////////
 // tour type
 const createTourType = async (payload: ITourType) => {
     const existingTourType = await TourType.findOne({ name: payload.name });
@@ -226,10 +227,10 @@ const createTourType = async (payload: ITourType) => {
 };
 
 
-
 const getAllTourTypes = async () => {
     return await TourType.find();
 };
+
 
 const updateTourType = async (id: string, payload: ITourType) => {
     const existingTourType = await TourType.findById(id);
@@ -241,6 +242,7 @@ const updateTourType = async (id: string, payload: ITourType) => {
     return updatedTourType;
 };
 
+
 const deleteTourType = async (id: string) => {
     const existingTourType = await TourType.findById(id);
     if (!existingTourType) {
@@ -249,6 +251,7 @@ const deleteTourType = async (id: string) => {
 
     return await TourType.findByIdAndDelete(id);
 };
+
 
 export const TourService = {
     createTour,

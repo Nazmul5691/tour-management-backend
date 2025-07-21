@@ -9,7 +9,6 @@ const createDivision = async (payload: IDivision) => {
         throw new Error("A division with this name already exists.");
     }
 
-
     // const baseSlug = payload.name.toLowerCase().split(" ").join("-")
     // let slug = `${baseSlug}-division`
 
@@ -40,7 +39,8 @@ const getAllDivisions = async () => {
 
 
 const getSingleDivision = async (slug: string) => {
-    const division = await Division.findOne({ slug });
+    const division = await Division.findOne({slug})
+    
     return {
         data: division,
     }
