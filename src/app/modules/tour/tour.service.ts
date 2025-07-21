@@ -129,11 +129,24 @@ const getAllTours = async (query: Record<string, string>) => {
 
     const queryBuilder = new QueryBuilder(Tour.find(), query)
 
-    // const tours = await queryBuilder.filter().modelQuery
-    const tours = await queryBuilder.search(tourSearchableFields).filter().modelQuery
+    const tours = await queryBuilder
+        .search(tourSearchableFields)
+        .filter()
+        .sort()
+        .fields()
+        .paginate()
+
+
+    // const meta = await queryBuilder.getMeta()
+
+    const [data, meta] = await Promise.all([
+        tours.build(),
+        queryBuilder.getMeta()
+    ])
 
     return {
-        data: tours
+        data,
+        meta
     }
 };
 

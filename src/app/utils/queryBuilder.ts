@@ -29,9 +29,11 @@ export class QueryBuilder<T> {
         const searchQuery = {
             $or: searchableField.map(field => ({ [field]: { $regex: searchTerm, $options: "i" } }))
         }
+
         this.modelQuery = this.modelQuery.find(searchQuery)
         return this
     }
+
 
     sort(): this {
 
@@ -41,6 +43,8 @@ export class QueryBuilder<T> {
 
         return this;
     }
+
+
     fields(): this {
 
         const fields = this.query.fields?.split(",").join(" ") || ""
@@ -49,6 +53,9 @@ export class QueryBuilder<T> {
 
         return this;
     }
+
+
+
     paginate(): this {
 
         const page = Number(this.query.page) || 1
@@ -60,9 +67,13 @@ export class QueryBuilder<T> {
         return this;
     }
 
+
+
     build() {
         return this.modelQuery
     }
+
+
 
     async getMeta() {
         const totalDocuments = await this.modelQuery.model.countDocuments()
@@ -72,6 +83,11 @@ export class QueryBuilder<T> {
 
         const totalPage = Math.ceil(totalDocuments / limit)
 
-        return { page, limit, total: totalDocuments, totalPage }
+        return {
+            page,
+            limit,
+            total: totalDocuments,
+            totalPage
+        }
     }
 }
