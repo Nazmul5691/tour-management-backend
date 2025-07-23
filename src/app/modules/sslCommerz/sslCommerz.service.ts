@@ -15,7 +15,7 @@ const sslPaymentInit = async (payload: ISSLCommerz) => {
             total_amount: payload.amount,
             currency: "BDT",
             tran_id: payload.transactionId,
-            success_url: envVars.SSL.SSL_SUCCESS_BACKEND_URL,
+            success_url: `${envVars.SSL.SSL_SUCCESS_BACKEND_URL}?transactionId=${payload.transactionId}`,
             fail_url: envVars.SSL.SSL_FAIL_BACKEND_URL,
             cancel_url: envVars.SSL.SSL_CANCEL_BACKEND_URL,
             // ipn_url: "http://localhost:3030/ipn",
