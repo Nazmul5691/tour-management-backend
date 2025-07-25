@@ -24,13 +24,14 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(cookieParser())
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 app.use(cors());
 
 
 app.use("/api/v1", router);
 
 
-app.get("/", (req: Request, res: Response) =>{
+app.get("/", (req: Request, res: Response) => {
     res.status(200).json({
         message: "Welcome to Tour Management System Backend"
     })
