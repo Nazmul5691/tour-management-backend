@@ -9,8 +9,7 @@ const router = Router();
 
 
 
-// router.post("/init-payment/:bookingId", PaymentController.initPayment);
-
+router.post("/init-payment/:bookingId", PaymentController.initPayment);
 router.post("/success", PaymentController.successPayment);
 router.post("/fail", PaymentController.failPayment);
 router.post("/cancel", PaymentController.cancelPayment);
