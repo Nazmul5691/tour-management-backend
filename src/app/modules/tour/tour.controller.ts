@@ -42,7 +42,7 @@ const getAllTours = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-const getSingleTour = catchAsync(async (req: Request, res: Response) =>{
+const getSingleTour = catchAsync(async (req: Request, res: Response) => {
     const slug = req.params.slug;
     const result = await TourService.getSingleTour(slug);
 
@@ -57,8 +57,14 @@ const getSingleTour = catchAsync(async (req: Request, res: Response) =>{
 
 
 const updateTour = catchAsync(async (req: Request, res: Response) => {
+    const payload: ITour = {
+        ...req.body,
+        images: (req.files as Express.Multer.File[]).map(file => file.path)
+    }
+    const result = await TourService.updateTour(req.params.id, payload);
 
-    const result = await TourService.updateTour(req.params.id, req.body);
+
+    // const result = await TourService.updateTour(req.params.id, req.body);
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -87,7 +93,7 @@ const deleteTour = catchAsync(async (req: Request, res: Response) => {
 // tour type
 const createTourType = catchAsync(async (req: Request, res: Response) => {
     const { name } = req.body;
-    const result = await TourService.createTourType({name});
+    const result = await TourService.createTourType({ name });
     sendResponse(res, {
         statusCode: 201,
         success: true,
