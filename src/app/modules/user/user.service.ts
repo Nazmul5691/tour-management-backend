@@ -8,6 +8,7 @@ import { envVars } from "../../config/env";
 import { JwtPayload } from "jsonwebtoken";
 import { QueryBuilder } from "../../utils/queryBuilder";
 import { divisionSearchableFields } from "../division/division.constant";
+import { userSearchableFields } from "./user.constant";
 
 
 // const createUser = async (payload: Partial<IUser>) =>{
@@ -123,15 +124,15 @@ const getAllUsers = async (query: Record<string, string>) => {
 
     const queryBuilder = new QueryBuilder(User.find(), query)
 
-    const divisionsData = await queryBuilder
-        .search(divisionSearchableFields)
+    const usersData = await queryBuilder
+        .search(userSearchableFields)
         .sort()
         .filter()
         .fields()
         .paginate()
 
     const [data, meta] = await Promise.all([
-        divisionsData.build(),
+        usersData.build(),
         queryBuilder.getMeta()
     ])
 
