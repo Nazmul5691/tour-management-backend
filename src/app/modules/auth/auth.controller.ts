@@ -33,7 +33,9 @@ const credentialsLogin = catchAsync(async (req: Request, res: Response, next: Ne
 
             //    use those
             //    return next(err)
-            return next(new AppError(401, err))
+            // return next(new AppError(401, err))
+            return next(new AppError(err.statusCode || 401, err))
+            // return next(new AppError(401, err.message))
         }
 
         if (!user) {
@@ -80,6 +82,7 @@ const credentialsLogin = catchAsync(async (req: Request, res: Response, next: Ne
     //     data: loginInfo
     // })
 })
+
 
 const getNewAccessToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
