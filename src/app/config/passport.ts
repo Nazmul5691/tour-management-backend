@@ -4,9 +4,11 @@ import passport from "passport";
 import { Strategy as GoogleStrategy, Profile, VerifyCallback } from "passport-google-oauth20";
 import { envVars } from "./env";
 import { User } from "../modules/user/user.model";
-import { Role } from "../modules/user/user.interface";
+import { IsActive, Role } from "../modules/user/user.interface";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcryptjs from 'bcryptjs';
+// import AppError from "../errorHelpers/appError";
+// import httpStatus from 'http-status-codes'
 
 
 
@@ -27,6 +29,19 @@ passport.use(
 
                 if (!isUserExit) {
                     return done("User does not exist")
+                }
+
+                if (!isUserExit.isVerified) {
+                    // throw new AppError(httpStatus.BAD_REQUEST, "User is not verified")
+                    return done("User does not verified")
+                }
+                if (isUserExit.isActive === IsActive.BLOCKED || isUserExit.isActive === IsActive.INACTIVE) {
+                    // throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExit.isActive}`)
+                    return done(`User is ${isUserExit.isActive}`)
+                }
+                if (isUserExit.isDeleted) {
+                    // throw new AppError(httpStatus.BAD_REQUEST, "User is deleted")
+                    return done("User is deleted")
                 }
 
                 const isGoogleAuthenticated = isUserExit.auths.some(providerObjects => providerObjects.provider == 'google')
@@ -68,10 +83,27 @@ passport.use(
                     return done(null, false, { message: "No email found" })
                 }
 
-                let user = await User.findOne({ email })
+                // let user = await User.findOne({ email })
+                let isUserExit = await User.findOne({ email })
 
-                if (!user) {
-                    user = await User.create({
+                if (isUserExit && !isUserExit.isVerified) {
+                    // throw new AppError(httpStatus.BAD_REQUEST, "User is not verified")
+                    // return done("User does not verified")
+                    return done(null, false, { message: "User does not verified" })
+                }
+                if (isUserExit && (isUserExit.isActive === IsActive.BLOCKED || isUserExit.isActive === IsActive.INACTIVE)) {
+                    // throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExit.isActive}`)
+                    return done(`User is ${isUserExit.isActive}`)
+                }
+                if (isUserExit && isUserExit.isDeleted) {
+                    // throw new AppError(httpStatus.BAD_REQUEST, "User is deleted")
+                    return done(null, false, { message: "User is deleted" })
+                }
+
+                // if (!user) {
+                if (!isUserExit) {
+                    // user = await User.create({
+                    isUserExit = await User.create({
                         email,
                         name: profile.displayName,
                         picture: profile.photos?.[0].value,
@@ -86,7 +118,8 @@ passport.use(
                     })
                 }
 
-                return done(null, user)
+                // return done(null, user)
+                return done(null, isUserExit)
 
             } catch (error) {
                 console.log("Google Strategy error", error);
