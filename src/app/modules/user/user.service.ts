@@ -62,14 +62,24 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
      * promoting to superAdmin  - only superAdmin
      */
 
+    if (decodedToken.role === Role.USER || decodedToken.role === Role.GUIDE) {
+        if (userId !== decodedToken.userId) {
+            throw new AppError(401, "You are not authorized")
+        }
+    }
+
+
     const ifUserExists = await User.findById(userId);
     // const isPhoneNumberExits = await User.findOne(phone)
-
-
 
     if (!ifUserExists) {
         throw new AppError(httpStatus.NOT_FOUND, "User not found");
     }
+
+    if (decodedToken.role === Role.ADMIN && ifUserExists.role === Role.SUPER_ADMIN) {
+        throw new AppError(401, "You are not authorized")
+    }
+    
 
     if (payload.phone) {
         const isPhoneNumberExits = await User.findOne({ phone: payload.phone });
@@ -84,9 +94,9 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
             throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
         }
 
-        if (payload.role === Role.SUPER_ADMIN && decodedToken.role === Role.ADMIN) {
-            throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
-        }
+        // if (payload.role === Role.SUPER_ADMIN && decodedToken.role === Role.ADMIN) {
+        //     throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
+        // }
     }
 
     if (payload.isActive || payload.isDeleted || payload.isVerified) {
@@ -95,9 +105,9 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
         }
     }
 
-    if (payload.password) {
-        payload.password = await bcryptjs.hash(payload.password, envVars.BCRYPT_SALT_ROUND)
-    }
+    // if (payload.password) {
+    //     payload.password = await bcryptjs.hash(payload.password, envVars.BCRYPT_SALT_ROUND)
+    // }
 
 
     const newUpdatedUser = await User.findByIdAndUpdate(userId, payload, { new: true, runValidators: true })
@@ -120,6 +130,9 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decodedToken:
 //         }
 //     };
 // }
+
+
+
 const getAllUsers = async (query: Record<string, string>) => {
 
     const queryBuilder = new QueryBuilder(User.find(), query)
