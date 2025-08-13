@@ -1,4 +1,5 @@
 "use strict";
+/* eslint-disable no-console */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -14,20 +15,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const app_1 = __importDefault(require("./app"));
+const env_1 = require("./app/config/env");
+const seedSuperAdmin_1 = require("./app/utils/seedSuperAdmin");
+const redis_config_1 = require("./app/config/redis.config");
 let server;
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield mongoose_1.default.connect("mongodb+srv://noteApp:noteApp@cluster0.laemifb.mongodb.net/tour-management-backend?retryWrites=true&w=majority&appName=Cluster0");
+        yield mongoose_1.default.connect(env_1.envVars.DB_URL);
         console.log('connected to db');
-        server = app_1.default.listen(5000, () => {
-            console.log('Server is listing on port 5000');
+        server = app_1.default.listen(env_1.envVars.PORT, () => {
+            console.log(`Server is listing on port ${env_1.envVars.PORT}`);
         });
     }
     catch (error) {
         console.log(error);
     }
 });
-startServer();
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, redis_config_1.connectRedis)();
+    yield startServer();
+    yield (0, seedSuperAdmin_1.seedSuperAdmin)();
+}))();
 process.on("unhandledRejection", (err) => {
     console.log("Unhandled Rejection detected... Server shutting down...", err);
     if (server) {
